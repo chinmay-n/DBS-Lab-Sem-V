@@ -1,0 +1,177 @@
+SQL> create table PERSON(driver_id# char(8), name varchar(25), address varchar(50), primary key(driver_id#));
+
+SQL> create table CAR(regno char(6), model varchar(6), year int,primary key(regno));
+
+SQL> create table ACCIDENT(report_no int, accd_date date, location varchar(20),p
+rimary key(report_no));
+
+Table created.
+
+SQL> create table OWNS(driver_id# char(8),regno char(6),foreign key(driver_id#)
+references PERSON(driver_id#),foreign key (regno) references CAR(regno), primary
+ key (regno));
+
+Table created.
+
+SQL> create table PARTICIPATED(driver_id# char(8),regno char(6),rep_no int, dmg_
+amt int,foreign key(driver_id#) references PERSON(driver_id#),foreign key (regno
+) references CAR(regno), primary key (rep_no));
+
+Table created.
+
+
+
+
+SQL> select * FROM PERSON;
+
+DRIVER_I NAME
+-------- ----------
+ADDRESS
+-------------------
+12345678 XYZ
+123,PQR Lane
+
+12345671 AYZ
+123,PQZ Lane
+
+87654321 KUNAL
+17TH STREET
+
+
+DRIVER_I NAME
+-------- ----------
+ADDRESS
+-------------------
+12456789 HARSH
+14TH STREET
+
+23456789 ROHAN
+12TH STREET
+
+SELECT * FROM CARS;
+
+REGNO  MODEL        YEAR
+------ ------ ----------
+789456 POLO         2012
+456123 ALTO         2013
+789123 VENTO        2013
+123456 CITY         2014
+123789 CITY         2012
+
+
+SELECT * FROM ACCIDENT;
+
+
+ REPORT_NO ACCD_DATE LOCATION
+---------- --------- --------------------
+        10 12-JAN-12 P SQUARE
+        11 13-NOV-12 Q SQUARE
+        13 23-JUN-15 33RD STREET
+        14 19-JUL-15 ELM STREET
+        15 19-OCT-15 DAVIS STREET
+        12 13-AUG-14 Q SQUARE
+
+
+
+SELECT * FROM OWNS;
+
+
+DRIVER_I REGNO
+-------- ------
+12345678 789456
+12345671 789123
+87654321 456123
+12456789 123456
+23456789 123789
+
+
+SELECT * FROM PARTICIPATED;
+
+
+DRIVER_I REGNO      REP_NO    DMG_AMT
+-------- ------ ---------- ----------
+12345678 789456         10       2500
+12345671 789123         11       3500
+87654321 456123         12      45000
+12456789 123456         13       5689
+23456789 123789         14       8700
+12345678 789456         15      25600
+
+
+
+SQL> UPDATE PARTICIPATED SET dmg_amt = 25000 WHERE rep_no=12;
+
+1 row updated.
+
+SQL> SELECT * FROM PARTICIPATED;
+
+DRIVER_I REGNO      REP_NO    DMG_AMT
+-------- ------ ---------- ----------
+12345678 789456         10       2500
+12345671 789123         11       3500
+87654321 456123         12      25000
+12456789 123456         13       5689
+23456789 123789         14       8700
+12345678 789456         15      25600
+
+
+
+SQL> alter table person add age int;
+
+Table altered.
+
+SQL> select * from person ;
+
+DRIVER_I NAME
+-------- -------------------------
+ADDRESS                                                   AGE
+-------------------------------------------------- ----------
+12345678 XYZ
+123,PQR Lane
+
+12345671 AYZ
+123,PQZ Lane
+
+87654321 KUNAL
+17TH STREET
+
+
+DRIVER_I NAME
+-------- -------------------------
+ADDRESS                                                   AGE
+-------------------------------------------------- ----------
+12456789 HARSH
+14TH STREET
+
+23456789 ROHAN
+12TH STREET
+
+SQL> alter table person drop column address;
+
+Table altered.
+
+SQL> select * from person;
+
+DRIVER_I NAME                             AGE
+-------- ------------------------- ----------
+12345678 XYZ
+12345671 AYZ
+87654321 KUNAL
+12456789 HARSH
+23456789 ROHAN
+
+SQL> alter table PERSON
+  2  add constraint age18 check (age>18);
+SQL> insert into person values('11123211','abc',12);
+insert into person values('11123211','abc',12)
+*
+ERROR at line 1:
+ORA-02290: check constraint (IT3110.AGE18) violated
+
+
+SQL> delete from accident where extract (year from accd_date)='2012';
+delete from accident where extract (year from accd_date)='2012'
+*
+ERROR at line 1:
+ORA-02292: integrity constraint (IT3110.SYS_C0095546) violated - child record
+found

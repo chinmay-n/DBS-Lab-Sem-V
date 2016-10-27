@@ -1,0 +1,49 @@
+1)
+SQL> select count(distinct driver_id#) from participated,accident where report_no=rep_no and extract (year from accd_date)='2012';
+
+
+COUNT(DISTINCTDRIVER_ID#)
+-------------------------
+                        2
+
+2)
+SQL> select model,count(model) as No_Of_accidents from car,participated where car.regno=participated.regno group by model;
+
+MODEL  NO_OF_ACCIDENTS
+------ ---------------
+ALTO                 1
+POLO                 2
+VENTO                1
+CITY                 2
+
+3)
+SQL> select count(participated.driver_id#) as No_of_accidents,person.name as owner_name,sum(dmg_amt) as total_dmg from person,participated where person.driver_id#=participated.driver_id# group by person.driver_id#,person.name;
+
+NO_OF_ACCIDENTS OWNER_NAME                 TOTAL_DMG
+--------------- ------------------------- ----------
+              1 AYZ                             3500
+              1 HARSH                           5689
+              1 ROHAN                           8700
+              1 KUNAL                          25000
+              2 XYZ                            28100
+
+4)
+SQL> select count(participated.driver_id#) as No_of_accidents,person.name as owner_name from person,participated where person.driver_id#=participated.driver_id# group by person.driver_id#,person.name having count(participated.driver_id#)>=2;
+
+NO_OF_ACCIDENTS OWNER_NAME
+--------------- -------------------------
+              2 XYZ
+
+5)
+SQL> select person.name as owner_name from person where person.driver_id# not in(select participated.driver_id# from participated);
+
+OWNER_NAME
+-------------------------
+11111111
+
+
+SQL> select name,driver_id# from person where driver_id# in (select driver_id# from person minus select driver_id# from participated);
+
+NAME                      DRIVER_I
+------------------------- --------
+11111111                  hello

@@ -1,0 +1,125 @@
+SQL> create table book_adoption(course# int, sem int, book_isbn int, foreign key
+(course#) references course(course#),foreign key(book_isbn) references text(book
+_isbn),primary key(course#,sem,book_isbn));
+
+
+SQL> create table enroll(regno char(5),course# int,book_isbn int,sem int,foreign
+ key(regno) references student(regno),foreign key(course#) references course(cou
+rse#), foreign key(book_isbn) references text(book_isbn),primary key(regno,cours
+e#));
+
+
+SQL> create table student(regno char(5),name varchar(5),major varchar(5),bdate d
+ate,primary key(regno));
+
+
+SQL> create table course(course# int, cname varchar(8),dept varchar(5),primary k
+ey(course#));
+
+
+SQL> create table text(book_isbn int, booktitle varchar(10),publisher varchar(10
+),author varchar(10),primary key(book_isbn));
+
+
+
+
+SQL> SELECT * FROM STUDENT;
+
+REGNO NAME  MAJOR BDATE
+----- ----- ----- ---------
+11111 abc   IT    12-JAN-90
+22222 XYZ   cs    12-JAN-91
+33333 XYQ   cs    16-MAR-91
+44444 PQR   AUTO  16-MAR-95
+55555 OMN   CHE   16-AUG-93
+
+SQL> SELECT * FROM COURSE;
+
+   COURSE# CNAME    DEPT
+---------- -------- -----
+         1 BASIC CS CSE
+         2 BASIC IT ICT
+         3 B. MECH  MECH
+         4 B. CHEM  CHE
+         5 B.AUTO   MECH
+
+SQL> SELECT * FROM TEXT;
+
+ BOOK_ISBN BOOKTITLE  PUBLISHER  AUTHOR
+---------- ---------- ---------- ----------
+       123 BME        PENGUIN    RAO
+       456 CSE        PENGUIN    SARTAJ
+       789 ITT        WILEY      WILLIAMS
+         1 M.ARCH     WOOD       WILLIAMS
+         2 AUTO B.    RAM        SINGH
+
+SQL> SELECT * FROM ENROLL;
+
+REGNO    COURSE#  BOOK_ISBN        SEM
+----- ---------- ---------- ----------
+11111          1        456          3
+11111          2        789          3
+22222          2        789          3
+33333          1        456          3
+44444          3        123          3
+
+
+SQL> SELECT * FROM BOOK_ADOPTION;
+
+   COURSE#        SEM  BOOK_ISBN
+---------- ---------- ----------
+         1          3        456
+         1          3        789
+         2          3        789
+         3          3        123
+         5          4          2
+         5          4        123
+
+A) 
+SQL> SELECT DISTINCT(C.COURSE#),C.CNAME,C.DEPT FROM COURSE C,BOOK_ADOPTION B WHERE C.COURSE#=B.COURSE# AND 1<(SELECT COUNT(*) FROM BOOK_ADOPTION BK WHERE BK.COURSE#=C.COURSE#);
+
+   COURSE# CNAME    DEPT
+---------- -------- -----
+         1 BASIC CS CSE
+         5 B.AUTO   MECH
+
+B)
+SQL> select DISTINCT dept from course c where course# in (select b.course# from book_adoption b,text t where b.book_isbn=t.book_isbn and t.publisher='PENGUIN');
+
+C)
+SQL> SELECT * FROM STUDENT S WHERE S.REGNO NOT IN (SELECT REGNO FROM ENROLL);
+
+REGNO NAME  MAJOR BDATE
+----- ----- ----- ---------
+55555 OMN   CHE   16-AUG-93
+
+D)
+SQL> SELECT DISTINCT S.* FROM STUDENT S,COURSE C, ENROLL E WHERE S.REGNO=E.REGNO AND 1<(SELECT COUNT(DISTINCT C2.COURSE#) FROM COURSE C1,ENROLL C2 WHERE S.REGNO=C2.REGNO);
+
+REGNO NAME  MAJOR BDATE
+----- ----- ----- ---------
+11111 abc   IT    12-JAN-90
+
+E)
+SQL> SELECT DISTINCT DEPT FROM COURSE C WHERE NOT EXISTS ((SELECT BOOK_ISBN FROM TEXT WHERE PUBLISHER='WILEY') MINUS (SELECT BOOK_ISBN FROM BOOK_ADOPTION NATURAL JOIN COURSE J WHERE J.DEPT=C.DEPT));
+
+F)
+SQL> select B.BOOK_ISBN,b.booktitle from text b where b.book_isbn in (select book_isbn from enroll e natural join book_adoption ba);
+
+G)
+SQL> SELECT DISTINCT T.BOOKTITLE,T.BOOK_ISBN FROM TEXT T, BOOK_ADOPTION B WHERE B.BOOK_ISBN=T.BOOK_ISBN AND B.BOOK_ISBN IN (SELECT BOOK_ISBN FROM ENROLL);
+
+H)
+SQL> SELECT REGNO,COUNT(REGNO) AS CNT FROM ENROLL E GROUP BY REGNO HAVING COUNT(REGNO)=(SELECT MAX(COUNT(REGNO)) FROM ENROLL GROUP BY REGNO);
+
+I)
+SQL> select distinct p.publisher,(select count(t.booktitle) from text t where p. publisher=t.publisher) as count from text p;
+
+PUBLISHER  (SELECTCOUNT(T.BOOKTITLE)FROMTEXTTWHEREP.PUBLISHER=T.PUBLISHER)
+---------- ---------------------------------------------------------------
+WOOD                                                                     1
+RAM                                                                      1
+PENGUIN                                                                  2
+WILEY                                                                    1
+
+J)
