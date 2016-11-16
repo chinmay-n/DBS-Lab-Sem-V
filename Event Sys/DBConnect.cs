@@ -26,10 +26,10 @@ namespace ConnectCsharpToMysql
         //Initialize values
         private void Initialize()
         {
-            server = "localhost";
-            database = "connectcsharptomysql";
-            uid = "username";
-            password = "password";
+            server = "ec2-54-244-217-141.us-west-2.compute.amazonaws.com";
+            database = "events";
+            uid = "root";
+            password = "000000";
             string connectionString;
             connectionString = "SERVER=" + server + ";" + "DATABASE=" + database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";";
 
